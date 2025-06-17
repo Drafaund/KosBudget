@@ -14,6 +14,7 @@ from components.auth import render_auth_page
 from utils.state_manager import SessionManager
 from config.database import DatabaseManager
 from pages.form_input import render_form_input
+from pages.dashboard import render_dashboard as render_dashboard_pages
 
 # Page configuration
 st.set_page_config(
@@ -66,7 +67,7 @@ def render_dashboard():
     col1, col2 = st.columns([3, 1])
     with col1:
         st.markdown('<h1 class="title-gradient">🏠 KosBudget Dashboard</h1>', unsafe_allow_html=True)
-        st.markdown(f'<p style="color: white;">Selamat datang, **{user_data["username"]}**!</p>', unsafe_allow_html=True)
+        st.markdown(f'<p style="color: black;">Selamat datang, **{user_data["username"]}**!</p>', unsafe_allow_html=True)
     
     with col2:
         if st.button("🚪 Logout", key="logout_btn"):
@@ -87,7 +88,7 @@ def render_dashboard():
     
     # Content area
     if selected_menu == "📈 Dashboard":
-        render_dashboard_content()
+        render_dashboard_pages()
     elif selected_menu == "📝 Form Input":
         render_form_input()
     elif selected_menu == "⚙️ Settings":
