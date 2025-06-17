@@ -64,29 +64,34 @@ class CategoryService:
     
     @staticmethod
     def get_categories(user_id):
-        """Get all active categories for a user"""
+        """Get all active categories for a user, with spent info"""
         try:
-            print(f"[DEBUG] Getting categories for user: {user_id}")
-            
             query = """
-            SELECT category_id, name, priority, urgency, frequency, impact, 
-                   COALESCE(allocation, 0) as allocation
-            FROM categories
-            WHERE user_id = %s AND is_active = TRUE
-            ORDER BY name;
+                SELECT 
+                    category_id,
+                    category_name AS name,
+                    priority,
+                    urgency,
+                    frequency,
+                    impact,
+                    allocation,
+                    total_spent
+                FROM category_summary
+                WHERE user_id = %s
+                ORDER BY category_id;
             """
-            
-            success, result = DatabaseManager.execute_query(query, (user_id,), fetch=True)
-            
-            print(f"[DEBUG] Query result - Success: {success}, Count: {len(result) if result else 0}")
-            
-            if success:
-                return True, result if result else []
+            params = (user_id,)
+            from config.database import DatabaseManager
+            success, result = DatabaseManager.execute_query(query, params, fetch=True)
+            print("[DEBUG] category_summary result:", success, result)
+            if success and result:
+                return True, result
+            elif success:
+                return True, []
             else:
                 return False, []
-                
         except Exception as e:
-            print(f"[DEBUG] Exception in get_categories: {str(e)}")
+            print(f"[ERROR] get_categories: {e}")
             return False, []
     
     @staticmethod

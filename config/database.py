@@ -25,35 +25,22 @@ class DatabaseManager:
         """Execute database query with optional fetch"""
         connection = None
         cursor = None
-        
         try:
             connection = DatabaseManager.get_connection()
             if not connection:
-                return False, "No database connection"
-            
+                return False, []
             cursor = connection.cursor(cursor_factory=RealDictCursor)
-            
-            if params:
-                cursor.execute(query, params)
-            else:
-                cursor.execute(query)
-            
+            cursor.execute(query, params)
             if fetch:
                 result = cursor.fetchall()
-                # Convert to list of dicts for easier handling
-                result = [dict(row) for row in result] if result else []
+                connection.commit()
+                return True, result
             else:
-                result = cursor.rowcount
-            
-            connection.commit()
-            return True, result
-            
+                connection.commit()
+                return True, None
         except Exception as e:
-            if connection:
-                connection.rollback()
-            print(f"Database error: {e}")
-            return False, str(e)
-            
+            print(f"[DB ERROR] {e}")
+            return False, []
         finally:
             if cursor:
                 cursor.close()
